@@ -19,12 +19,10 @@ router.get('/', listContacts);
 
 router.get('/:id', getById);
 
-router.post('/', checkNewContactData);
-router.post('/', addContact);
+router.post('/', checkNewContactData, addContact);
 
 router.delete('/:id', removeContact);
 
-router.put('/:id', checkEditedContactData);
-router.put('/:id', updateContact);
+router.put('/:id', checkEditedContactData, updateContact);
 
 module.exports = router;
