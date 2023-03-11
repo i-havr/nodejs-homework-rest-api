@@ -1,7 +1,5 @@
 const Joi = require('joi');
 
-// Validate new contact's data.
-
 exports.validateNewContact = data => {
   const schema = Joi.object({
     name: Joi.string().min(2).max(255).required(),
@@ -10,8 +8,6 @@ exports.validateNewContact = data => {
   });
   return schema.validate(data);
 };
-
-// Validate new contact's data.
 
 exports.validateEditedContact = data => {
   const schema = Joi.object({
