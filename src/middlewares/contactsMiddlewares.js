@@ -9,8 +9,12 @@ exports.checkNewContactData = (req, _, next) => {
 
   const { name, email, phone } = req.body;
 
-  if (!name || !email || !phone) {
+  if (!name) {
     return next(new AppError(400, 'missing required name field'));
+  } else if (!email) {
+    return next(new AppError(400, 'missing required email field'));
+  } else if (!phone) {
+    return next(new AppError(400, 'missing required phone field'));
   } else if (error) {
     return next(new AppError(400, error.details[0].message));
   } else {
