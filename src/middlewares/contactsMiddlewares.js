@@ -1,3 +1,7 @@
+const { Types } = require('mongoose');
+
+const { Contact } = require('../models/contactModel');
+
 const {
   AppError,
   validateNewContact,
@@ -47,4 +51,20 @@ exports.checkEditedStatus = (req, _, next) => {
     req.body = value;
     next();
   }
+};
+
+exports.checkContactId = async (req, _, next) => {
+  const { id } = req.params;
+
+  const idIsValid = Types.ObjectId.isValid(id);
+
+  if (!idIsValid) return next(new AppError(404, 'Not found'));
+
+  const contactExists = await Contact.exists({ _id: id });
+
+  if (!contactExists) {
+    return next(new AppError(404, 'Not found'));
+  }
+
+  next();
 };

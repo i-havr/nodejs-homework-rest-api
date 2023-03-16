@@ -1,6 +1,7 @@
 const { Contact } = require('../models/contactModel');
 
 const listContacts = async () => {
+  console.log(Contact);
   const contacts = await Contact.find();
   return contacts;
 };
@@ -36,12 +37,7 @@ const updateContact = async (contactId, body) => {
 };
 
 const updateStatusContact = async (contactId, body) => {
-  const updatedContact = await Contact.findByIdAndUpdate(
-    contactId,
-    { $set: body },
-    { new: true }
-  );
-  return updateContact;
+  return await updateContact(contactId, body);
 };
 
 module.exports = {
@@ -52,7 +48,3 @@ module.exports = {
   updateContact,
   updateStatusContact,
 };
-
-// getById не получається обробити помилку, коли ввожу недійсний id. З'являється помилка від mongoose, а не кастомна 404.
-
-// updateContact також не видає кастомну помилку.

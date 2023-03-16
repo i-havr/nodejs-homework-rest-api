@@ -2,6 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 
+const { catchAsync } = require('../../helpers');
+
 const {
   listContactsController,
   getByIdController,
@@ -15,18 +17,33 @@ const {
   checkNewContactData,
   checkEditedContactData,
   checkEditedStatus,
+  checkContactId,
 } = require('../../middlewares/contactsMiddlewares');
 
-router.get('/', listContactsController);
+router.get('/', catchAsync(listContactsController));
 
-router.get('/:id', getByIdController);
+router.get('/:id', catchAsync(checkContactId), catchAsync(getByIdController));
 
-router.post('/', checkNewContactData, addContactController);
+router.post('/', checkNewContactData, catchAsync(addContactController));
 
-router.delete('/:id', removeContactController);
+router.delete(
+  '/:id',
+  catchAsync(checkContactId),
+  catchAsync(removeContactController)
+);
 
-router.put('/:id', checkEditedContactData, updateContactController);
+router.put(
+  '/:id',
+  checkEditedContactData,
+  catchAsync(checkContactId),
+  catchAsync(updateContactController)
+);
 
-router.patch('/:id/favorite', checkEditedStatus, updateStatusContactController);
+router.patch(
+  '/:id/favorite',
+  checkEditedStatus,
+  catchAsync(checkContactId),
+  catchAsync(updateStatusContactController)
+);
 
 module.exports = router;
