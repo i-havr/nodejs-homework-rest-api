@@ -16,14 +16,14 @@ app.use('/api/contacts', contactsRouter);
 
 app.all('*', (_, res) => {
   res.status(404).json({
-    msg: 'Not Found!',
+    message: 'Not Found!',
   });
 });
 
 app.use((err, _, res, __) => {
-  const { status } = err;
+  const { status, message } = err;
 
-  res.status(status || 500).json({ message: err.message });
+  res.status(status || 500).json({ message });
 });
 
 module.exports = app;
