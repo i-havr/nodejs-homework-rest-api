@@ -20,6 +20,10 @@ const {
   checkContactId,
 } = require('../../middlewares/contactsMiddlewares');
 
+const { checkToken } = require('../../middlewares/usersMiddlewares');
+
+router.use(checkToken);
+
 router.get('/', catchAsync(listContactsController));
 
 router.get('/:id', catchAsync(checkContactId), catchAsync(getByIdController));

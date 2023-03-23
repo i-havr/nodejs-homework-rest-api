@@ -1,7 +1,6 @@
 const { Contact } = require('../models/contactModel');
 
 const listContacts = async () => {
-  console.log(Contact);
   const contacts = await Contact.find();
   return contacts;
 };

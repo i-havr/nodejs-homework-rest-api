@@ -19,3 +19,11 @@ exports.validateEditedContact = data => {
   });
   return schema.validate(data);
 };
+
+exports.validateUserData = data => {
+  const schema = Joi.object({
+    email: Joi.string().min(5).max(255).email(),
+    password: Joi.string().min(5).max(255),
+  });
+  return schema.validate(data);
+};

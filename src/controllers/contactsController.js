@@ -9,12 +9,12 @@ const {
   updateStatusContact,
 } = require('../services/contactsService');
 
-exports.listContactsController = async (_, res) => {
+const listContactsController = async (_, res) => {
   const contacts = await listContacts();
   res.status(200).json(contacts);
 };
 
-exports.getByIdController = async (req, res, next) => {
+const getByIdController = async (req, res, next) => {
   const { id } = req.params;
 
   const contact = await getById(id);
@@ -24,7 +24,7 @@ exports.getByIdController = async (req, res, next) => {
     : next(new AppError(404, 'Not found'));
 };
 
-exports.removeContactController = async (req, res, next) => {
+const removeContactController = async (req, res, next) => {
   const { id } = req.params;
   const contact = await removeContact(id);
 
@@ -33,12 +33,12 @@ exports.removeContactController = async (req, res, next) => {
     : next(new AppError(404, 'Not found'));
 };
 
-exports.addContactController = async (req, res) => {
+const addContactController = async (req, res) => {
   const newContact = await addContact(req.body);
   res.status(201).json(newContact);
 };
 
-exports.updateContactController = async (req, res) => {
+const updateContactController = async (req, res) => {
   const { id } = req.params;
   const contact = await updateContact(id, req.body);
 
@@ -47,11 +47,20 @@ exports.updateContactController = async (req, res) => {
     : res.status(404).json({ message: 'Not found' });
 };
 
-exports.updateStatusContactController = async (req, res) => {
+const updateStatusContactController = async (req, res) => {
   const { id } = req.params;
   const contact = await updateStatusContact(id, req.body);
 
   return contact
     ? res.status(200).json(contact)
     : res.status(404).json({ message: 'Not found' });
+};
+
+module.exports = {
+  listContactsController,
+  getByIdController,
+  removeContactController,
+  addContactController,
+  updateContactController,
+  updateStatusContactController,
 };
