@@ -68,3 +68,16 @@ exports.checkContactId = async (req, _, next) => {
 
   next();
 };
+
+exports.checkAuthAccess = async (req, _, next) => {
+  const { _id: userId } = req.user;
+  const { id: contactId } = req.params;
+
+  const contact = await Contact.findById(contactId);
+
+  if (contact.owner.toString() !== userId.toString()) {
+    return next(new AppError(404, 'Not found'));
+  }
+
+  next();
+};

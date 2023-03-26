@@ -18,6 +18,7 @@ const {
   checkEditedContactData,
   checkEditedStatus,
   checkContactId,
+  checkAuthAccess,
 } = require('../../middlewares/contactsMiddlewares');
 
 const { checkToken } = require('../../middlewares/usersMiddlewares');
@@ -26,13 +27,19 @@ router.use(checkToken);
 
 router.get('/', catchAsync(listContactsController));
 
-router.get('/:id', catchAsync(checkContactId), catchAsync(getByIdController));
+router.get(
+  '/:id',
+  catchAsync(checkContactId),
+  catchAsync(checkAuthAccess),
+  catchAsync(getByIdController)
+);
 
 router.post('/', checkNewContactData, catchAsync(addContactController));
 
 router.delete(
   '/:id',
   catchAsync(checkContactId),
+  catchAsync(checkAuthAccess),
   catchAsync(removeContactController)
 );
 
@@ -40,6 +47,7 @@ router.put(
   '/:id',
   checkEditedContactData,
   catchAsync(checkContactId),
+  catchAsync(checkAuthAccess),
   catchAsync(updateContactController)
 );
 
@@ -47,6 +55,7 @@ router.patch(
   '/:id/favorite',
   checkEditedStatus,
   catchAsync(checkContactId),
+  catchAsync(checkAuthAccess),
   catchAsync(updateStatusContactController)
 );
 

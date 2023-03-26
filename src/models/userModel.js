@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
-const { hash } = require('bcrypt');
+const subEnum = require('../constants/subscriptions');
 
-const { AppError } = require('../helpers');
+const { hash } = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   password: {
@@ -12,12 +12,14 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Email is required'],
+    trim: true,
+    lowercase: true,
     unique: true,
   },
   subscription: {
     type: String,
-    enum: ['starter', 'pro', 'business'],
-    default: 'starter',
+    enum: Object.values(subEnum),
+    default: subEnum.STARTER,
   },
   token: String,
 });

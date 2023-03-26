@@ -9,12 +9,14 @@ const {
   loginUserController,
   logoutUserController,
   currentUserController,
+  updateSubscriptionController,
 } = require('../../controllers/usersController');
 
 const {
   checkRegisterData,
   checkLoginData,
   checkToken,
+  checkSubscriptionUpdating,
 } = require('../../middlewares/usersMiddlewares');
 
 router.post(
@@ -35,6 +37,13 @@ router.post(
   '/current',
   catchAsync(checkToken),
   catchAsync(currentUserController)
+);
+
+router.patch(
+  '/',
+  catchAsync(checkToken),
+  checkSubscriptionUpdating,
+  catchAsync(updateSubscriptionController)
 );
 
 module.exports = router;

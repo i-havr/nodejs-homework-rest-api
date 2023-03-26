@@ -9,9 +9,25 @@ const {
   updateStatusContact,
 } = require('../services/contactsService');
 
-const listContactsController = async (_, res) => {
-  const contacts = await listContacts();
-  res.status(200).json(contacts);
+const listContactsController = async (req, res) => {
+  const { page, limit, favorite } = req.query;
+
+  const { id } = req.user;
+
+  const paginationPage = +page || 1;
+  let paginationLimit = +limit || 20;
+  paginationLimit = paginationLimit > 20 ? 20 : paginationLimit;
+  const skip = (paginationPage - 1) * paginationLimit;
+
+  const filterOptions = favorite
+    ? { skip, paginationLimit, favorite }
+    : { skip, paginationLimit };
+
+  const { total, contacts } = await listContacts(id, filterOptions);
+
+  res
+    .status(200)
+    .json({ total, page: paginationPage, limit: paginationLimit, contacts });
 };
 
 const getByIdController = async (req, res, next) => {
@@ -34,7 +50,16 @@ const removeContactController = async (req, res, next) => {
 };
 
 const addContactController = async (req, res) => {
-  const newContact = await addContact(req.body);
+  const newContactData = {
+    name: req.body.name,
+    email: req.body.email,
+    phone: req.body.phone,
+    owner: req.user,
+  };
+  const newContact = await addContact(newContactData);
+
+  newContact.owner.password = undefined;
+
   res.status(201).json(newContact);
 };
 

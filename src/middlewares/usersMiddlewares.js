@@ -7,6 +7,7 @@ const {
   UnauthorizedError,
   EmailConflictError,
   validateUserData,
+  validateSubscriptionUpdateData,
 } = require('../helpers');
 
 const checkRegisterData = async (req, _, next) => {
@@ -52,7 +53,7 @@ const checkLoginData = async (req, _, next) => {
 const checkToken = async (req, _, next) => {
   const [tokenType, token] = req.headers.authorization?.split(' ');
 
-  if (!token) {
+  if (!token || tokenType !== 'Bearer') {
     return next(new UnauthorizedError());
   }
 
@@ -62,11 +63,12 @@ const checkToken = async (req, _, next) => {
     if (userData) {
       const { id } = userData;
 
-      const user = await User.findById(id);
+      const user = await User.findById(id).select({ __v: 0 });
 
       req.user = user;
       next();
     } else {
+      req.token = null;
       return next(new UnauthorizedError());
     }
   } catch (error) {
@@ -74,4 +76,22 @@ const checkToken = async (req, _, next) => {
   }
 };
 
-module.exports = { checkRegisterData, checkLoginData, checkToken };
+const checkSubscriptionUpdating = (req, _, next) => {
+  const { error, value } = validateSubscriptionUpdateData(req.body);
+
+  if (error) {
+    return next(
+      new AppError(400, error.details[0].context.key + ' data is not valid')
+    );
+  } else {
+    req.body = value;
+    next();
+  }
+};
+
+module.exports = {
+  checkRegisterData,
+  checkLoginData,
+  checkToken,
+  checkSubscriptionUpdating,
+};

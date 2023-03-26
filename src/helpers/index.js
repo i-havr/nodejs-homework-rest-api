@@ -10,6 +10,7 @@ const {
   validateNewContact,
   validateEditedContact,
   validateUserData,
+  validateSubscriptionUpdateData,
 } = require('./joiValidators');
 
 module.exports = {
@@ -21,4 +22,5 @@ module.exports = {
   validateNewContact,
   validateEditedContact,
   validateUserData,
+  validateSubscriptionUpdateData,
 };

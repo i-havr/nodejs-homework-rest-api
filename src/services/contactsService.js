@@ -1,12 +1,21 @@
 const { Contact } = require('../models/contactModel');
 
-const listContacts = async () => {
-  const contacts = await Contact.find();
-  return contacts;
+const listContacts = async (id, filterOptions) => {
+  const { skip, paginationLimit, favorite } = filterOptions;
+  const findOptions = favorite ? { owner: id, favorite } : { owner: id };
+
+  const contacts = await Contact.find(findOptions)
+    .select({ __v: 0 })
+    .skip(skip)
+    .limit(paginationLimit);
+
+  const total = await Contact.count(findOptions);
+
+  return { total, contacts };
 };
 
-const getById = async contactId => {
-  const contact = await Contact.findById(contactId);
+const getById = async id => {
+  const contact = await Contact.findById(id);
   return contact;
 };
 
@@ -15,11 +24,12 @@ const removeContact = async contactId => {
   return removedContact;
 };
 
-const addContact = async ({ name, email, phone }) => {
+const addContact = async ({ name, email, phone, owner }) => {
   const contact = new Contact({
     name,
     email,
     phone,
+    owner,
   });
 
   await contact.save();
