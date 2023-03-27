@@ -13,10 +13,10 @@ const {
 const registerUserController = async (req, res) => {
   const { email, password } = req.body;
 
-  const newUser = await registerUser(email, password);
+  const { subscription } = await registerUser(email, password);
 
   res.status(201).json({
-    user: newUser,
+    user: { email, subscription },
   });
 };
 
