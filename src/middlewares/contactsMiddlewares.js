@@ -14,11 +14,11 @@ exports.checkNewContactData = (req, _, next) => {
   const { name, email, phone } = req.body;
 
   if (!name) {
-    return next(new AppError(400, 'missing required name field'));
+    return next(new AppError(400, 'missing required [name] field'));
   } else if (!email) {
-    return next(new AppError(400, 'missing required email field'));
+    return next(new AppError(400, 'missing required [email] field'));
   } else if (!phone) {
-    return next(new AppError(400, 'missing required phone field'));
+    return next(new AppError(400, 'missing required [phone] field'));
   } else if (error) {
     return next(new AppError(400, error.details[0].message));
   } else {
@@ -63,6 +63,19 @@ exports.checkContactId = async (req, _, next) => {
   const contactExists = await Contact.exists({ _id: id });
 
   if (!contactExists) {
+    return next(new AppError(404, 'Not found'));
+  }
+
+  next();
+};
+
+exports.checkAuthAccess = async (req, _, next) => {
+  const { _id: userId } = req.user;
+  const { id: contactId } = req.params;
+
+  const contact = await Contact.findById(contactId);
+
+  if (contact.owner.toString() !== userId.toString()) {
     return next(new AppError(404, 'Not found'));
   }
 

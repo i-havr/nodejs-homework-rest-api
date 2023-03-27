@@ -9,12 +9,28 @@ const {
   updateStatusContact,
 } = require('../services/contactsService');
 
-exports.listContactsController = async (_, res) => {
-  const contacts = await listContacts();
-  res.status(200).json(contacts);
+const listContactsController = async (req, res) => {
+  const { page, limit, favorite } = req.query;
+
+  const { id } = req.user;
+
+  const paginationPage = +page || 1;
+  let paginationLimit = +limit || 20;
+  paginationLimit = paginationLimit > 20 ? 20 : paginationLimit;
+  const skip = (paginationPage - 1) * paginationLimit;
+
+  const filterOptions = favorite
+    ? { skip, paginationLimit, favorite }
+    : { skip, paginationLimit };
+
+  const { total, contacts } = await listContacts(id, filterOptions);
+
+  res
+    .status(200)
+    .json({ total, page: paginationPage, limit: paginationLimit, contacts });
 };
 
-exports.getByIdController = async (req, res, next) => {
+const getByIdController = async (req, res, next) => {
   const { id } = req.params;
 
   const contact = await getById(id);
@@ -24,7 +40,7 @@ exports.getByIdController = async (req, res, next) => {
     : next(new AppError(404, 'Not found'));
 };
 
-exports.removeContactController = async (req, res, next) => {
+const removeContactController = async (req, res, next) => {
   const { id } = req.params;
   const contact = await removeContact(id);
 
@@ -33,12 +49,21 @@ exports.removeContactController = async (req, res, next) => {
     : next(new AppError(404, 'Not found'));
 };
 
-exports.addContactController = async (req, res) => {
-  const newContact = await addContact(req.body);
+const addContactController = async (req, res) => {
+  const newContactData = {
+    name: req.body.name,
+    email: req.body.email,
+    phone: req.body.phone,
+    owner: req.user,
+  };
+  const newContact = await addContact(newContactData);
+
+  newContact.owner.password = undefined;
+
   res.status(201).json(newContact);
 };
 
-exports.updateContactController = async (req, res) => {
+const updateContactController = async (req, res) => {
   const { id } = req.params;
   const contact = await updateContact(id, req.body);
 
@@ -47,11 +72,20 @@ exports.updateContactController = async (req, res) => {
     : res.status(404).json({ message: 'Not found' });
 };
 
-exports.updateStatusContactController = async (req, res) => {
+const updateStatusContactController = async (req, res) => {
   const { id } = req.params;
   const contact = await updateStatusContact(id, req.body);
 
   return contact
     ? res.status(200).json(contact)
     : res.status(404).json({ message: 'Not found' });
+};
+
+module.exports = {
+  listContactsController,
+  getByIdController,
+  removeContactController,
+  addContactController,
+  updateContactController,
+  updateStatusContactController,
 };
