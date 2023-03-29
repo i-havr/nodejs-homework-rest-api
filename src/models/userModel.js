@@ -4,6 +4,8 @@ const subEnum = require('../constants/subscriptions');
 
 const { hash } = require('bcrypt');
 
+const crypto = require('crypto');
+
 const userSchema = new mongoose.Schema({
   password: {
     type: String,
@@ -22,10 +24,14 @@ const userSchema = new mongoose.Schema({
     default: subEnum.STARTER,
   },
   token: String,
+  avatarURL: String,
 });
 
 userSchema.pre('save', async function () {
   if (this.isNew) {
+    const emailHash = crypto.createHash('md5').update(this.email).digest('hex');
+    this.avatarURL = `https://www.gravatar.com/avatar/${emailHash}.jpeg?d=robohash`;
+
     this.password = await hash(this.password, 10);
   }
 });

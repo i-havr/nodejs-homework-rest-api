@@ -58,8 +58,6 @@ const addContactController = async (req, res) => {
   };
   const newContact = await addContact(newContactData);
 
-  newContact.owner.password = undefined;
-
   res.status(201).json(newContact);
 };
 
