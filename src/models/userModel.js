@@ -23,7 +23,10 @@ const userSchema = new mongoose.Schema({
     enum: Object.values(subEnum),
     default: subEnum.STARTER,
   },
-  token: String,
+  token: {
+    type: String,
+    default: '',
+  },
   avatarURL: String,
 });
 
