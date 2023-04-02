@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 
+const ImageService = require('../services/imageService');
+
 const { User } = require('../models/userModel');
 
 const {
@@ -63,7 +65,11 @@ const checkToken = async (req, _, next) => {
     if (userData) {
       const { id } = userData;
 
-      const user = await User.findById(id).select({ __v: 0 });
+      const user = await User.findById(id).select({
+        __v: 0,
+        token: 0,
+        password: 0,
+      });
 
       req.user = user;
       next();
@@ -89,9 +95,12 @@ const checkSubscriptionUpdating = (req, _, next) => {
   }
 };
 
+const uploadFilesMiddleware = ImageService.upload('avatar');
+
 module.exports = {
   checkRegisterData,
   checkLoginData,
   checkToken,
   checkSubscriptionUpdating,
+  uploadFilesMiddleware,
 };

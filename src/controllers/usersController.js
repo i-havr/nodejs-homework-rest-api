@@ -1,3 +1,5 @@
+const fs = require('fs').promises;
+
 const { LoginError, UnauthorizedError } = require('../helpers');
 
 const { signToken } = require('../services/signToken');
@@ -9,6 +11,8 @@ const {
   getCurrentUser,
   updateSubscription,
 } = require('../services/usersService');
+
+const ImageService = require('../services/imageService');
 
 const registerUserController = async (req, res) => {
   const { email, password } = req.body;
@@ -32,7 +36,7 @@ const loginUserController = async (req, res, next) => {
 
     user.token = token;
 
-    user.save();
+    await user.save();
 
     return res.status(200).json({
       token,
@@ -91,10 +95,29 @@ const updateSubscriptionController = async (req, res, next) => {
   }
 };
 
+const uploadFilesController = async (req, res) => {
+  const { file, user } = req;
+
+  if (file) {
+    user.avatarURL = (
+      await ImageService.save(file, 'avatars', user.id)
+    ).replace(/\\/g, '/');
+
+    await user.save();
+
+    fs.unlink(file.path);
+  }
+
+  return res.status(200).json({
+    avatarURL: user.avatarURL,
+  });
+};
+
 module.exports = {
   registerUserController,
   loginUserController,
   logoutUserController,
   currentUserController,
   updateSubscriptionController,
+  uploadFilesController,
 };

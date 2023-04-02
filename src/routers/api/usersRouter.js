@@ -1,5 +1,5 @@
 const express = require('express');
-
+const path = require('path');
 const router = express.Router();
 
 const { catchAsync } = require('../../helpers');
@@ -10,6 +10,7 @@ const {
   logoutUserController,
   currentUserController,
   updateSubscriptionController,
+  uploadFilesController,
 } = require('../../controllers/usersController');
 
 const {
@@ -17,6 +18,7 @@ const {
   checkLoginData,
   checkToken,
   checkSubscriptionUpdating,
+  uploadFilesMiddleware,
 } = require('../../middlewares/usersMiddlewares');
 
 router.post(
@@ -45,5 +47,14 @@ router.patch(
   checkSubscriptionUpdating,
   catchAsync(updateSubscriptionController)
 );
+
+router.patch(
+  '/avatars',
+  catchAsync(checkToken),
+  uploadFilesMiddleware,
+  catchAsync(uploadFilesController)
+);
+
+router.use('/download', express.static(path.resolve('./public/avatars')));
 
 module.exports = router;
