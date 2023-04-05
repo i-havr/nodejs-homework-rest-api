@@ -3,8 +3,6 @@ const uuid = require('uuid').v4;
 
 const { sendEmail } = require('./sendEmail');
 
-const { AppError } = require('../helpers');
-
 const { User } = require('../models/userModel');
 
 const registerUser = async (email, password) => {
