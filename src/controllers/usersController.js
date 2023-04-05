@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 
-const { LoginError, UnauthorizedError } = require('../helpers');
+const { AppError, LoginError, UnauthorizedError } = require('../helpers');
 
 const { signToken } = require('../services/signToken');
 
@@ -10,6 +10,8 @@ const {
   logoutUser,
   getCurrentUser,
   updateSubscription,
+  verifyUserByToken,
+  resendEmailConfirmation,
 } = require('../services/usersService');
 
 const ImageService = require('../services/imageService');
@@ -113,6 +115,50 @@ const uploadFilesController = async (req, res) => {
   });
 };
 
+const verifyUserByTokenController = async (req, res, next) => {
+  const { verificationToken } = req.params;
+
+  const user = await verifyUserByToken(verificationToken);
+
+  if (user) {
+    user.verify = true;
+    user.verificationToken = null;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: 'Verification successful',
+    });
+  } else {
+    return next(new AppError(404, 'User not found'));
+  }
+};
+
+const resendEmailConfirmationController = async (req, res, next) => {
+  const { email } = req.body;
+
+  const user = await resendEmailConfirmation(email);
+
+  if (user) {
+    const { verify } = user;
+
+    if (verify) {
+      return next(new AppError(400, 'Verification has already been passed'));
+    }
+
+    user.verify = true;
+    user.verificationToken = null;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: 'Verification email sent',
+    });
+  } else {
+    return next(new AppError(404, 'User not found'));
+  }
+};
+
 module.exports = {
   registerUserController,
   loginUserController,
@@ -120,4 +166,6 @@ module.exports = {
   currentUserController,
   updateSubscriptionController,
   uploadFilesController,
+  verifyUserByTokenController,
+  resendEmailConfirmationController,
 };

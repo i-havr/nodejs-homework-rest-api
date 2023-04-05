@@ -11,6 +11,8 @@ const {
   currentUserController,
   updateSubscriptionController,
   uploadFilesController,
+  verifyUserByTokenController,
+  resendEmailConfirmationController,
 } = require('../../controllers/usersController');
 
 const {
@@ -19,6 +21,7 @@ const {
   checkToken,
   checkSubscriptionUpdating,
   uploadFilesMiddleware,
+  checkResendingEmailConfirmationData,
 } = require('../../middlewares/usersMiddlewares');
 
 router.post(
@@ -56,5 +59,16 @@ router.patch(
 );
 
 router.use('/download', express.static(path.resolve('./public/avatars')));
+
+router.get(
+  '/verify/:verificationToken',
+  catchAsync(verifyUserByTokenController)
+);
+
+router.post(
+  '/verify',
+  checkResendingEmailConfirmationData,
+  catchAsync(resendEmailConfirmationController)
+);
 
 module.exports = router;
