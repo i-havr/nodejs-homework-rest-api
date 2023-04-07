@@ -1,0 +1,26 @@
+# Налаштовуємо docker-compose для створення ЛОКАЛЬНОЇ бази даних db.
+# Якщо нам НЕ потрібна ЛОКАЛЬНА база даних, то у файлі .env у змінній MONGO_URL вказуємо повну адресу до бази Atlas MongoDB.
+# Якщо нам потрібна ЛОКАЛЬНА база даних (тобто ми хочемо підняти окрему БД на локальному хостингу чи у себе на комп'ютері), то у файлі .env у змінній MONGO_URL вказуємо MONGO_URL='mongodb://db:27017'
+# В нашому випадку є лише папка бекенд-проекту. Для запуску та коректної роботи необхідно створити ще й фронтенд. Тоді файл docker-compose.yml необхідно було б перемістити в самий корінь застосунку.
+
+# Запуск та зупинка docker-compose:
+# docker compose up
+# docker compose down
+
+version: '3'
+services:
+  db:
+    image: mongo
+    volumes:
+      - ./db:/data/db
+  backend:
+    build: ./back
+    ports:
+      - '3000:3000'
+    restart: always
+    depends_on:
+      - db
+  frontend:
+    build: ./front
+    ports:
+      - '4000:8080'
