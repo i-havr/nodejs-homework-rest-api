@@ -38,3 +38,10 @@ exports.validateSubscriptionUpdateData = data => {
   });
   return schema.validate(data);
 };
+
+exports.validateResendingEmailData = data => {
+  const schema = Joi.object({
+    email: Joi.string().min(5).max(255).email().required(),
+  });
+  return schema.validate(data);
+};

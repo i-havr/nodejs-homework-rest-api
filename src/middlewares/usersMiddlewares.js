@@ -10,6 +10,7 @@ const {
   EmailConflictError,
   validateUserData,
   validateSubscriptionUpdateData,
+  validateResendingEmailData,
 } = require('../helpers');
 
 const checkRegisterData = async (req, _, next) => {
@@ -97,10 +98,30 @@ const checkSubscriptionUpdating = (req, _, next) => {
 
 const uploadFilesMiddleware = ImageService.upload('avatar');
 
+const checkResendingEmailConfirmationData = async (req, _, next) => {
+  const { error, value } = validateResendingEmailData(req.body);
+
+  const { email } = req.body;
+
+  if (!email) {
+    return next(new AppError(400, 'missing required field email'));
+  } else if (Object.keys(req.body).length > 1) {
+    return next(new AppError(400, 'Only email address required'));
+  } else if (error) {
+    return next(
+      new AppError(400, error.details[0].context.key + ' field is not valid')
+    );
+  } else {
+    req.body = value;
+    next();
+  }
+};
+
 module.exports = {
   checkRegisterData,
   checkLoginData,
   checkToken,
   checkSubscriptionUpdating,
   uploadFilesMiddleware,
+  checkResendingEmailConfirmationData,
 };
